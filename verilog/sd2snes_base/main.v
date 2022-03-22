@@ -1196,8 +1196,7 @@ assign SNES_DATABUS_OE = (msu_enable & ReadOrWrite_r) ? 1'b0 :
                          (ctx_wr_enable & SNES_SNOOPWR_DATA_OE) ? 1'b0 :
                          (ctx_pawr_enable & SNES_SNOOPPAWR_DATA_OE)? 1'b0 :
                          (ctx_pard_enable & SNES_SNOOPPARD_DATA_OE)? 1'b0 :
-                         ((IS_ROM & SNES_ROMSEL)
-                          |(!IS_ROM & !IS_SAVERAM & !IS_WRITABLE & !IS_FLASHWR)
+                         ((!IS_ROM & !IS_SAVERAM & !IS_WRITABLE & !IS_FLASHWR)
                           |(SNES_READ_narrow & SNES_WRITE)
                           | bsx_tristate
                          );

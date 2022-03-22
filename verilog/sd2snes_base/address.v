@@ -91,7 +91,8 @@ wire [23:0] SAVERAM_ADDR = {4'hE,1'b0,SAVERAM_BASE,11'h0};
 /* HiROM:   SRAM @ Bank 0x30-0x3f, 0xb0-0xbf
             Offset 6000-7fff */
 
-assign IS_ROM = ~SNES_ROMSEL;
+assign IS_READ_ZERO = !SNES_ADDR[22] & !SNES_ADDR[15] & &SNES_ADDR[14:13];
+assign IS_ROM = ~SNES_ROMSEL | IS_READ_ZERO;
 
 // Calculate pre IS_SAVERAM to relax timing.  Uses
 // early SNES_ADDR from main.
@@ -192,8 +193,10 @@ assign SRAM_SNES_ADDR = IS_PATCH
                           ?(IS_SAVERAM
                             ? SAVERAM_ADDR + ({SNES_ADDR[20:16], SNES_ADDR[14:0]}
                                             & SAVERAM_MASK)
-                            : ({1'b0, ~SNES_ADDR[23], SNES_ADDR[22:16], SNES_ADDR[14:0]}
-                               & ROM_MASK))
+                            :(IS_READ_ZERO
+                               ? (24'h000008 & ROM_MASK)
+                               : ({1'b0, ~SNES_ADDR[23], SNES_ADDR[22:16], SNES_ADDR[14:0]}
+                               & ROM_MASK)))
 
                           :(MAPPER_DEC[3'b010])
                           ?(IS_SAVERAM
